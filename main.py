@@ -1,14 +1,38 @@
 from avl import AVLTree
-from os import system
+from random import randint
+import os
 
 if __name__ == "__main__":
     tree = AVLTree()
 
     while True:
-        try:
-            num = int(input('Inserir: '))
-        except:
-            break
-        tree.insert_key(num)
-        system('cls')
-        print(tree.graph())
+        command = input().split(' ')
+        match command[0]:
+            case 'i':
+                tree.insert(int(command[1]))
+                os.system('cls')
+                print(tree.graph())
+            case 'd':
+                tree.delete(int(command[1]))
+                os.system('cls')
+                print(tree.graph())
+            case 's':
+                print("Found:", tree.search(int(command[1])))
+            case 'r':
+                num = randint(10, 99)
+                tree.insert(num)
+                os.system('cls')
+                print(tree.graph())
+                print(f'Tried to insert {num}')
+            case 'p':
+                tree.inorder()
+            case 't':
+                for i in range(100_000):
+                    tree.insert(randint(0, 75_000))
+                print("Insertion test finished.")
+                for i in range(100_000):
+                    tree.delete(randint(0, 75_000))
+                print("Deletion test finished.")
+                tree = AVLTree()
+            case _:
+                break
