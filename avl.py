@@ -1,54 +1,27 @@
-from dataclasses import dataclass
 from typing import Optional, Any
 from io import StringIO
 
-@dataclass
 class Node:
-    value: int
-    left: Optional['Node'] = None
-    right: Optional['Node'] = None
-    parent: Optional['Node'] = None
+    def __init__(self, value: int):
+        self.value: int = value
+        self.left: Optional[Node] = None
+        self.right: Optional[Node] = None
+        self.height: int = 1
 
-    def __str__(self) -> str:
-        left_value = self.left.value if self.left else None
-        right_value = self.right.value if self.right else None
-        return f'(v:{self.value}, l: {left_value}, r: {right_value})'
-
-@dataclass
 class AVLTree:
-    root: Optional['Node']
-
-    def __init__(self) -> None:
+    def __init__(self):
         self.root = None
 
-    def insert(self, value: int) -> None:
-        if self.root is None:
-            self.root = Node(value)
-            return
-        
-        def __insert(node: Node, value: int):
-            if value == node.value:
-                return
-            if value < node.value:
-                if node.left is None:
-                    node.left = Node(value)
-                    node.left.parent = node
-                else:
-                    __insert(node.left, value)
-            else:
-                if node.right is None:
-                    node.right = Node(value)
-                    node.right.parent = node
-                else:
-                    __insert(node.right, value)
-        
-        __insert(self.root, value)
+    def insert_key(self, value: int):
+        self.root = insert(self.root, value)
+
+    def inorder(self, root: Optional[Node]):
+        if root:
+            self.inorder(root.left)
+            print(root.value, end=" ")
+            self.inorder(root.right)
     
-    def search(self, value: int) -> Optional[int]:
-        res = AVLTree.__search(self.root, value)
-        return res.value if res else None
-    
-    def height(self) -> int:
+    def calc_height(self) -> int:
         def __height(node: Optional[Node]) -> int:
             if node is None:
                 return 0
@@ -56,14 +29,6 @@ class AVLTree:
 
         return __height(self.root)
     
-    def dfs_print(self) -> None:
-        def __print(node: Optional[Node]):
-            if node:
-                print(f'{node.value} ', end='')
-                __print(node.left)
-                __print(node.right)
-        __print(self.root); print()
-
     def graph(self, block_size: int = 2, show_parent: bool = False) -> str:
         HEIGHT_FACTOR = 2
         def __walk(node: Optional[Node], height: int, x: int, y: int, matrix: list[list[Any]]):
@@ -73,10 +38,10 @@ class AVLTree:
                 __walk(node.left, height - 1, x - walk, y + 1 * HEIGHT_FACTOR, matrix)
                 __walk(node.right, height - 1, x + walk, y + 1 * HEIGHT_FACTOR, matrix)
         
-        height = self.height()
-        width = 2 ** height - 1
-        matrix: list[list[Any]] = [[None for _ in range(width)] for _ in range(height * HEIGHT_FACTOR)]
-        __walk(self.root, height, 2 ** (height - 1) - 1, 0, matrix)
+        h = height(self.root)
+        w = 2 ** h - 1
+        matrix: list[list[Any]] = [[None for _ in range(w)] for _ in range(h * HEIGHT_FACTOR)]
+        __walk(self.root, h, 2 ** (h - 1) - 1, 0, matrix)
         
         buffer = StringIO()
         for row in matrix:
@@ -91,56 +56,70 @@ class AVLTree:
         
         return buffer.getvalue()
 
-    def rotate(self, value: int, dir: str) -> None:
-        rot = AVLTree.__right_rotate if dir == 'right' else AVLTree.__left_rotate
-        A = AVLTree.__search(self.root, value)
-        if A:
-            B = rot(A)
-            if B.parent is None: self.root = B
+
+def height(node: Optional[Node]) -> int:
+    if not node:
+        return 0
+    return node.height
+
+def balance(node: Optional[Node]) -> int:
+    if not node:
+        return 0
+    return height(node.left) - height(node.right)
+
+
+def rotate_right(y: Node):
+    assert(y.left)
+    x = y.left
+    T2 = x.right
+
+    x.right = y
+    y.left = T2
+
+    y.height = 1 + max(height(y.left), height(y.right))
+    x.height = 1 + max(height(x.left), height(x.right))
+
+    return x
+
+def rotate_left(x: Node):
+    assert(x.right)
+    y = x.right
+    T2 = y.left
+
+    y.left = x
+    x.right = T2
+
+    x.height = 1 + max(height(x.left), height(x.right))
+    y.height = 1 + max(height(y.left), height(y.right))
+
+    return y
+
+def insert(root: Optional[Node], value: int) -> Optional[Node]:
+    if not root:
+        return Node(value)
+
+    if value < root.value:
+        root.left = insert(root.left, value)
+    else:
+        root.right = insert(root.right, value)
+
+    root.height = 1 + max(height(root.left), height(root.right))
+
+    bf = balance(root)
+
+    if bf > 1:
+        assert(root.left)
+        if value < root.left.value:
+            return rotate_right(root)
         else:
-            print(f'Value {value} was not found.')
-
-    
-    @staticmethod 
-    def __search(node: Optional[Node], value: int) -> Optional[Node]:
-        if not node:
-            return None
-        elif node.value == value:
-            return node
+            root.left = rotate_left(root.left)
+            return rotate_right(root)
+    if bf < -1:
+        assert(root.right)
+        if value > root.right.value:
+            return rotate_left(root)
         else:
-            return AVLTree.__search(node.left, value) or AVLTree.__search(node.right, value)
+            root.right = rotate_right(root.right)
+            return rotate_left(root)
 
-    @staticmethod
-    def __right_rotate(A: Node) -> Node:
-        assert(A.left is not None)
-        P = A.parent
-        B = A.left
-        A.left = B.right
-        if B.right: B.right.parent = A
-        B.right = A
-        A.parent = B
-        B.parent = P
-        if (P):
-            if P.left == A:
-                P.left = B
-            else:
-                P.right = B
-        return B
-    
-    @staticmethod
-    def __left_rotate(A: Node) -> Node:
-        assert(A.right is not None)
-        P = A.parent
-        B = A.right
-        A.right = B.left
-        if B.left: B.left.parent = A
-        B.left = A
-        A.parent = B
-        B.parent = P
-        if (P):
-            if P.left == A:
-                P.left = B
-            else:
-                P.right = B
-        return B
-
+    return root
