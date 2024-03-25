@@ -90,14 +90,8 @@ class AVLTree:
         rot = AVLTree.__right_rotate if dir == 'right' else AVLTree.__left_rotate
         A = AVLTree.__search(self.root, value)
         if A:
-            parent = A.parent
-            if parent:
-                if parent.value > A.value:
-                    parent.right = rot(A)
-                else:
-                    parent.left = rot(A)
-            else:
-                self.root = rot(A)
+            B = rot(A)
+            if B.parent is None: self.root = B
         else:
             print(f'Value {value} was not found.')
 
@@ -114,20 +108,34 @@ class AVLTree:
     @staticmethod
     def __right_rotate(A: Node) -> Node:
         assert(A.left is not None)
+        P = A.parent
         B = A.left
         A.left = B.right
-        if B.right: B.parent = A
+        if B.right: B.right.parent = A
         B.right = A
         A.parent = B
+        B.parent = P
+        if (P):
+            if P.left == A:
+                P.left = B
+            else:
+                P.right = B
         return B
     
     @staticmethod
     def __left_rotate(A: Node) -> Node:
         assert(A.right is not None)
+        P = A.parent
         B = A.right
         A.right = B.left
-        if B.left: B.parent = A
+        if B.left: B.left.parent = A
         B.left = A
         A.parent = B
+        B.parent = P
+        if (P):
+            if P.left == A:
+                P.left = B
+            else:
+                P.right = B
         return B
 
