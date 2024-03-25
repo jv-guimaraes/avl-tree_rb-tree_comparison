@@ -34,5 +34,15 @@ if __name__ == "__main__":
                     tree.delete(randint(0, 75_000))
                 print("Deletion test finished.")
                 tree = AVLTree()
+            case 't2':
+                numbers = [randint(0, 50_000) for _ in range(50_000)]
+                for num in numbers:
+                    tree.insert(num)
+                for num in numbers:
+                    tree.delete(num)
+                tree.inorder()
+                print("finished")
+                tree = AVLTree()
             case _:
                 break
+

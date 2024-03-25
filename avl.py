@@ -29,25 +29,8 @@ class AVLTree:
                 root.right = _insert(root.right, value)
 
             root.height = 1 + max(get_height(root.left), get_height(root.right))
-
-            bf = get_bf(root)
-
-            if bf > 1:
-                assert(root.left)
-                if value < root.left.value:
-                    return rotate_right(root)
-                else:
-                    root.left = rotate_left(root.left)
-                    return rotate_right(root)
-            if bf < -1:
-                assert(root.right)
-                if value > root.right.value:
-                    return rotate_left(root)
-                else:
-                    root.right = rotate_right(root.right)
-                    return rotate_left(root)
-
-            return root
+            
+            return balance(root)
         
         if self.search(value) is None:
             self.root = _insert(self.root, value)
@@ -84,7 +67,7 @@ class AVLTree:
                 root.left = _delete(root.left, value)
             elif value > root.value:
                 root.right = _delete(root.right, value)
-            else:  
+            else: #Encontrou o valor a ser deleta
                 if not root.left:  
                     return root.right
                 elif not root.right: 
@@ -98,23 +81,7 @@ class AVLTree:
 
             root.height = 1 + max(get_height(root.left), get_height(root.right))
 
-            bf = get_bf(root)
-            if bf > 1:
-                assert root.left
-                if get_bf(root.left) >= 0:
-                    return rotate_right(root)
-                else:
-                    root.left = rotate_left(root.left)
-                    return rotate_right(root)
-            elif bf < -1:
-                assert root.right
-                if get_bf(root.right) <= 0:
-                    return rotate_left(root)
-                else:
-                    root.right = rotate_right(root.right)
-                    return rotate_left(root)
-
-            return root
+            return balance(root)
 
         # old_root = self.root
         self.root = _delete(self.root, value)
@@ -158,7 +125,6 @@ def get_bf(node: Optional[Node]) -> int:
         return 0
     return get_height(node.left) - get_height(node.right)
 
-
 def rotate_right(y: Node) -> Node:
     assert y.left
     x = y.left
@@ -184,3 +150,22 @@ def rotate_left(x: Node) -> Node:
     y.height = 1 + max(get_height(y.left), get_height(y.right))
 
     return y
+
+def balance(root: Node) -> Node:
+    bf = get_bf(root)
+    if bf > 1:
+        assert root.left
+        if get_bf(root.left) >= 0:
+            return rotate_right(root)
+        else:
+            root.left = rotate_left(root.left)
+            return rotate_right(root)
+    elif bf < -1:
+        assert root.right
+        if get_bf(root.right) <= 0:
+            return rotate_left(root)
+        else:
+            root.right = rotate_right(root.right)
+            return rotate_left(root)
+
+    return root
