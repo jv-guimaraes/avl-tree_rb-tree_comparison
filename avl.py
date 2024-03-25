@@ -21,14 +21,6 @@ class AVLTree:
             print(root.value, end=" ")
             self.inorder(root.right)
     
-    def calc_height(self) -> int:
-        def __height(node: Optional[Node]) -> int:
-            if node is None:
-                return 0
-            return max(__height(node.left), __height(node.right)) + 1
-
-        return __height(self.root)
-    
     def graph(self, block_size: int = 2, show_parent: bool = False) -> str:
         HEIGHT_FACTOR = 2
         def __walk(node: Optional[Node], height: int, x: int, y: int, matrix: list[list[Any]]):
