@@ -12,7 +12,7 @@ class Node:
     def __str__(self) -> str:
         left_value = self.left.value if self.left else None
         right_value = self.right.value if self.right else None
-        return f'({self.value}, l: {left_value}, r: {right_value})'
+        return f'(v:{self.value}, l: {left_value}, r: {right_value})'
 
 @dataclass
 class AVLTree:
@@ -64,24 +64,29 @@ class AVLTree:
                 __print(node.right)
         __print(self.root); print()
 
-    def graph(self) -> str:
+    def graph(self, block_size: int = 2, show_parent: bool = False) -> str:
         HEIGHT_FACTOR = 2
         def __walk(node: Optional[Node], height: int, x: int, y: int, matrix: list[list[Any]]):
             if node:
-                matrix[y][x] = node.value
+                matrix[y][x] = node
                 walk = 2 ** (height - 2)
                 __walk(node.left, height - 1, x - walk, y + 1 * HEIGHT_FACTOR, matrix)
                 __walk(node.right, height - 1, x + walk, y + 1 * HEIGHT_FACTOR, matrix)
         
         height = self.height()
         width = 2 ** height - 1
-        matrix: list[list[Any]] = [['  ' for _ in range(width)] for _ in range(height * HEIGHT_FACTOR)]
+        matrix: list[list[Any]] = [[None for _ in range(width)] for _ in range(height * HEIGHT_FACTOR)]
         __walk(self.root, height, 2 ** (height - 1) - 1, 0, matrix)
         
         buffer = StringIO()
         for row in matrix:
-            for value in row:
-                buffer.write(f'{value} ')
+            for node in row:
+                if node is None:
+                    buffer.write((' ' * block_size) + ' '); continue
+                if show_parent and node.parent:
+                    buffer.write(f'{node.value}({node.parent.value}) ')
+                else:
+                    buffer.write(f'{node.value} ')
             buffer.write('\n')
         
         return buffer.getvalue()
