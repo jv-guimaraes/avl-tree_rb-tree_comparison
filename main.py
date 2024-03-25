@@ -14,7 +14,7 @@ while True:
         case 'i':
             tree.insert(num)
             os.system('cls')
-            tree.graph_print()
+            print(tree.graph())
         case 's':
             print(f'Found: {tree.search(num)}\n')
         case _:

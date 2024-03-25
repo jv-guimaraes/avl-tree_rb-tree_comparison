@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import Optional, Any
+from io import StringIO
 
 @dataclass
 class Node:
@@ -39,7 +40,17 @@ class AVLTree:
                     __insert(node.right, value)
         
         __insert(self.root, value)
-
+    
+    def search(self, value: int) -> Optional[int]:
+        def __search(node: Optional[Node], value: int) -> Optional[int]:
+            if not node:
+                return None
+            elif node.value == value:
+                return value
+            else:
+                return __search(node.left, value) or __search(node.right, value)
+        return __search(self.root, value)    
+    
     def height(self) -> int:
         def __height(node: Optional[Node]) -> int:
             if node is None:
@@ -56,7 +67,7 @@ class AVLTree:
                 __print(node.right)
         __print(self.root); print()
 
-    def graph_print(self) -> None:
+    def graph(self) -> str:
         HEIGHT_FACTOR = 2
         def __walk(node: Optional[Node], height: int, x: int, y: int, matrix: list[list[Any]]):
             if node:
@@ -69,17 +80,12 @@ class AVLTree:
         width = 2 ** height - 1
         matrix: list[list[Any]] = [['  ' for _ in range(width)] for _ in range(height * HEIGHT_FACTOR)]
         __walk(self.root, height, 2 ** (height - 1) - 1, 0, matrix)
+        
+        buffer = StringIO()
         for row in matrix:
             for value in row:
-                print(value, ' ', end='')
-            print()
+                buffer.write(f'{value} ')
+            buffer.write('\n')
+        
+        return buffer.getvalue()
 
-    def search(self, value: int) -> Optional[int]:
-        def __search(node: Optional[Node], value: int) -> Optional[int]:
-            if not node:
-                return None
-            elif node.value == value:
-                return value
-            else:
-                return __search(node.left, value) or __search(node.right, value)
-        return __search(self.root, value)    
