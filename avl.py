@@ -67,7 +67,7 @@ class AVLTree:
                 root.left = _delete(root.left, value)
             elif value > root.value:
                 root.right = _delete(root.right, value)
-            else: #Encontrou o valor a ser deleta
+            else: #Encontrou o valor a ser deletado
                 if not root.left:  
                     return root.right
                 elif not root.right: 
