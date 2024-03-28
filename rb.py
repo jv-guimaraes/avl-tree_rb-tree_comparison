@@ -1,31 +1,7 @@
 from dataclasses import dataclass
 from io import StringIO
-import os
 from typing import Optional, Any
 from enum import Enum
-
-def main():
-    tree = RBTree()
-
-    while True:
-        command = input().split(' ')
-        match command[0]:
-            case 'i':
-                tree.insert(int(command[1]))
-                os.system('cls')
-                print(tree)
-            case 'rr':
-                assert tree.root
-                tree.rotate_right(tree.root)
-                os.system('cls')
-                print(tree)
-            case 'rl':
-                assert tree.root
-                tree.rotate_left(tree.root)
-                os.system('cls')
-                print(tree)
-            case _:
-                break
 
 class Color(Enum):
     BLACK = 0
@@ -128,6 +104,17 @@ class RBTree:
         # Case 2: Father is red and uncle is black (line)
         if node.parent.is_red() and (uncle is None or uncle.is_black()) and node.parent.side() == node.side():
             pass
+    
+    def contains(self, value: int) -> bool:
+        return self.find_node(value) is not None
+    
+    def find_node(self, value: int) -> Optional[Node]:
+        def _search(node: Optional[Node], value: int) -> Optional[Node]:
+            if node is None: return None
+            if value == node.value: return node
+            if value <= node.value: return _search(node.left, value)
+            return _search(node.right, value)
+        return _search(self.root, value)
 
     def rotate_right(self, node: Node):
         assert node.left
@@ -142,7 +129,7 @@ class RBTree:
         child.parent = parent
         
         if parent:
-            if node.side() == Side.LEFT:
+            if parent.left == node:
                 parent.left = child
             else:
                 parent.right = child
@@ -162,28 +149,28 @@ class RBTree:
         child.parent = parent
         
         if parent:
-            if node.side() == Side.LEFT:
+            if parent.left == node:
                 parent.left = child
             else:
                 parent.right = child
         else:
             self.root = child
 
-def height(root: Optional[Any]) -> int:
-    if root is None:
-        return 0
-    return 1 + max(height(root.left), height(root.right))  
-
-def graph(root: Any, block_size: int = 2) -> str:
+def graph(root: Node, block_size: int = 2) -> str:
+    def _height(root: Optional[Node]) -> int:
+        if root is None:
+            return 0
+        return 1 + max(_height(root.left), _height(root.right))  
+    
     HEIGHT_FACTOR = 2
-    def _walk(node: Optional[Any], height: int, x: int, y: int, matrix: list[list[Any]]):
+    def _walk(node: Optional[Node], height: int, x: int, y: int, matrix: list[list[Any]]):
         if node:
             matrix[y][x] = node
             walk = 2 ** (height - 2)
             _walk(node.left, height - 1, x - walk, y + 1 * HEIGHT_FACTOR, matrix)
             _walk(node.right, height - 1, x + walk, y + 1 * HEIGHT_FACTOR, matrix)
     
-    h = height(root)
+    h = _height(root)
     w = 2 ** h - 1
     matrix: list[list[Any]] = [[None for _ in range(w)] for _ in range(h * HEIGHT_FACTOR)]
     _walk(root, h, 2 ** (h - 1) - 1, 0, matrix)
@@ -202,8 +189,3 @@ def graph(root: Any, block_size: int = 2) -> str:
         buffer.write('\n')
     
     return buffer.getvalue()
-
-if __name__ == "__main__":
-    main()
-    
-

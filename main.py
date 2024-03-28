@@ -1,8 +1,9 @@
 from avl import AVLTree
+from rb import RBTree
 from random import randint
 import os
 
-if __name__ == "__main__":
+def avl_main():
     tree = AVLTree()
 
     while True:
@@ -27,10 +28,10 @@ if __name__ == "__main__":
             case 'p':
                 tree.inorder()
             case 't':
-                for i in range(100_000):
+                for _ in range(100_000):
                     tree.insert(randint(0, 75_000))
                 print("Insertion test finished.")
-                for i in range(100_000):
+                for _ in range(100_000):
                     tree.delete(randint(0, 75_000))
                 print("Deletion test finished.")
                 tree = AVLTree()
@@ -45,4 +46,33 @@ if __name__ == "__main__":
                 tree = AVLTree()
             case _:
                 break
+
+def rb_main():
+    tree = RBTree()
+
+    while True:
+        command = input().split(' ')
+        match command[0]:
+            case 'i':
+                tree.insert(int(command[1]))
+                os.system('cls')
+                print(tree)
+            case 'c':
+                num = int(command[1])
+                print(f'Contains {num}? {tree.contains(num)}')
+            case 'rr':
+                node = tree.find_node(int(command[1]))
+                if node: tree.rotate_right(node)
+                os.system('cls')
+                print(tree)
+            case 'rl':
+                node = tree.find_node(int(command[1]))
+                if node: tree.rotate_left(node)
+                os.system('cls')
+                print(tree)
+            case _:
+                break
+
+if __name__ == "__main__":
+    rb_main()
 
