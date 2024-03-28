@@ -71,10 +71,11 @@ def rb_main():
                 os.system('cls')
                 print(tree)
             case 't':
-                n = 100
+                n = 10_000
                 nums = [randint(0, n) for _ in range(n)]
                 for num in nums:
                     tree.insert(num)
+                print("Finished testing")
             case _:
                 break
 

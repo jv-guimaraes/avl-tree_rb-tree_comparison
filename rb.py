@@ -1,47 +1,23 @@
 from io import StringIO
 from typing import Any, Optional
-from enum import Enum
 
-
-class Color(Enum):
-    BLACK = 0
-    RED = 1,
-
-class Side(Enum):
-    LEFT = 0,
-    RIGHT = 1
+BLACK = 0
+RED = 1
 
 class Node:
     value: Any
     left: 'Node'
     right: 'Node' 
     p: 'Node' 
-    color: Color = Color.RED
+    color: int = RED
 
-    def __init__(self, value: Any, color: Color = Color.RED) -> None:
+    def __init__(self, value: Any, color: int = RED) -> None:
         self.value = value
-
         self.color = color
-
-    def is_red(self) -> bool:
-        return self.color == Color.RED
-    
-    def is_black(self) -> bool:
-        return self.color == Color.BLACK
-    
-    def switch_color(self) -> None:
-        self.color = Color.BLACK if self.color == Color.RED else Color.RED
-
-    def side(self) -> Side:
-        assert self.p
-        if self.value <= self.p.value:
-            return Side.LEFT
-        return Side.RIGHT
-
 
 class RBTree:
     root: Node
-    nil = Node(value=None, color=Color.BLACK)
+    nil = Node(value=None, color=BLACK)
 
     def __init__(self) -> None:
         self.root = self.nil
@@ -73,7 +49,36 @@ class RBTree:
         self._fix_insert(z)
 
     def _fix_insert(self, z: Node):
-        pass
+        while z.p.color == RED:
+            if z.p == z.p.p.left:
+                y = z.p.p.right
+                if y.color == RED:
+                    z.p.color = BLACK
+                    y.color = BLACK
+                    z.p.p.color = RED
+                    z = z.p.p
+                else:
+                    if z == z.p.right:
+                        z = z.p
+                        self.rotate_left(z)
+                    z.p.color = BLACK
+                    z.p.p.color = RED
+                    self.rotate_right(z.p.p)
+            else:
+                y = z.p.p.left
+                if y.color == RED:
+                    z.p.color = BLACK
+                    y.color = BLACK
+                    z.p.p.color = RED
+                    z = z.p.p
+                else:
+                    if z == z.p.left:
+                        z = z.p
+                        self.rotate_right(z)
+                    z.p.color = BLACK
+                    z.p.p.color = RED
+                    self.rotate_left(z.p.p)
+        self.root.color = BLACK
 
     def contains(self, value: int) -> bool:
         return self.find_node(value) != self.nil
@@ -144,7 +149,7 @@ def graph(tree: RBTree, root: Node, block_size: int = 2) -> str:
             if node == tree.nil:
                 buffer.write((' ' * block_size) + ' '); continue
             else:            
-                if node.color == Color.BLACK:
+                if node.color == BLACK:
                     buffer.write(f'{node.value}B ')
                 else:
                     buffer.write(f'{node.value}R ')
