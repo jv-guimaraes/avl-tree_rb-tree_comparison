@@ -76,6 +76,7 @@ def rb_main():
                 for num in nums:
                     tree.insert(num)
                 print("Finished testing")
+                tree = RBTree()
             case _:
                 break
 

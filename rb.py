@@ -9,7 +9,7 @@ class Node:
     left: 'Node'
     right: 'Node' 
     p: 'Node' 
-    color: int = RED
+    color: int
 
     def __init__(self, value: Any, color: int = RED) -> None:
         self.value = value
@@ -50,34 +50,20 @@ class RBTree:
 
     def _fix_insert(self, z: Node):
         while z.p.color == RED:
-            if z.p == z.p.p.left:
-                y = z.p.p.right
-                if y.color == RED:
-                    z.p.color = BLACK
-                    y.color = BLACK
-                    z.p.p.color = RED
-                    z = z.p.p
-                else:
-                    if z == z.p.right:
-                        z = z.p
-                        self.rotate_left(z)
-                    z.p.color = BLACK
-                    z.p.p.color = RED
-                    self.rotate_right(z.p.p)
+            p_left = (z.p == z.p.p.left) # Se o pai é filho esquerdo
+            y = z.p.p.right if p_left else z.p.p.left
+            if y.color == RED:
+                z.p.color = BLACK
+                y.color = BLACK
+                z.p.p.color = RED
+                z = z.p.p
             else:
-                y = z.p.p.left
-                if y.color == RED:
-                    z.p.color = BLACK
-                    y.color = BLACK
-                    z.p.p.color = RED
-                    z = z.p.p
-                else:
-                    if z == z.p.left:
-                        z = z.p
-                        self.rotate_right(z)
-                    z.p.color = BLACK
-                    z.p.p.color = RED
-                    self.rotate_left(z.p.p)
+                if z == (z.p.right if p_left else z.p.left):
+                    z = z.p
+                    self.rotate_left(z) if p_left else self.rotate_right(z)                        
+                z.p.color = BLACK
+                z.p.p.color = RED
+                self.rotate_right(z.p.p) if p_left else self.rotate_left(z.p.p)
         self.root.color = BLACK
 
     def contains(self, value: int) -> bool:
@@ -92,7 +78,6 @@ class RBTree:
         return _search(self.root, value)
 
     def rotate_right(self, x: Node):
-        assert x.left
         y = x.left
         x.left = y.right
         if y.right != self.nil:
@@ -108,7 +93,6 @@ class RBTree:
         x.p = y
     
     def rotate_left(self, x: Node):
-        assert x.right
         y = x.right
         x.right = y.left
         if y.left != self.nil:

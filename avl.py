@@ -7,11 +7,7 @@ class Node:
     value: int
     left: Optional['Node'] = None
     right: Optional['Node'] = None
-    height: int = 1
-    
-    def __str__(self) -> str:
-        return f'({self.value}, {self.left}, {self.right})'
-        
+    height: int = 1        
          
 class AVLTree:
     def __init__(self):
@@ -128,10 +124,10 @@ def get_bf(node: Optional[Node]) -> int:
 def rotate_right(y: Node) -> Node:
     assert y.left
     x = y.left
-    T2 = x.right
+    z = x.right
 
     x.right = y
-    y.left = T2
+    y.left = z
 
     y.height = 1 + max(get_height(y.left), get_height(y.right))
     x.height = 1 + max(get_height(x.left), get_height(x.right))
@@ -141,10 +137,10 @@ def rotate_right(y: Node) -> Node:
 def rotate_left(x: Node) -> Node:
     assert x.right
     y = x.right
-    T2 = y.left
+    z = y.left
 
     y.left = x
-    x.right = T2
+    x.right = z
 
     x.height = 1 + max(get_height(x.left), get_height(x.right))
     y.height = 1 + max(get_height(y.left), get_height(y.right))
