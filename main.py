@@ -70,6 +70,11 @@ def rb_main():
                 if node: tree.rotate_left(node)
                 os.system('cls')
                 print(tree)
+            case 't':
+                n = 50
+                nums = [randint(0, n) for _ in range(n)]
+                for num in nums:
+                    tree.insert(num)
             case _:
                 break
 

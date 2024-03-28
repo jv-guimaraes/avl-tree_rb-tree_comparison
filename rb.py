@@ -56,6 +56,7 @@ class RBTree:
 
     def insert(self, value: int) -> None:
         new_node = Node(value)
+        # if new_node.value == 25: new_node.color = Color.BLACK
         
         if self.root is None:
             self.root = new_node
@@ -83,6 +84,7 @@ class RBTree:
         
         new_node.parent = curr_node
 
+
     def _fix_insert(self, node: Node):
         # Case 0: Root is red
         if node.parent is None:
@@ -101,9 +103,29 @@ class RBTree:
             uncle.switch_color()
             self._fix_insert(node.parent.parent)
         
-        # Case 2: Father is red and uncle is black (line)
-        if node.parent.is_red() and (uncle is None or uncle.is_black()) and node.parent.side() == node.side():
-            pass
+        # Case 2 or 3: Father is red and uncle is black
+        if node.parent.is_red() and (uncle is None or uncle.is_black()):
+            # Case 2: Triangle
+            if node.parent.side() != node.side():
+                
+                if node.side() == Side.LEFT:
+                    self.rotate_right(node.parent)
+                    new_node_to_be_fixed = node.right
+                else:
+                    self.rotate_left(node.parent)
+                    new_node_to_be_fixed = node.left
+                assert new_node_to_be_fixed
+                self._fix_insert(new_node_to_be_fixed)
+            else: # Case 3: Line
+                # Rotate grandparent to opposite side of node and recolor parent and grandparent
+                assert node.parent.parent
+                og_parent, og_grandparent = node.parent, node.parent.parent
+                if node.side() == Side.LEFT:
+                    self.rotate_right(node.parent.parent)
+                else:
+                    self.rotate_left(node.parent.parent)
+                og_parent.switch_color()
+                og_grandparent.switch_color()
     
     def contains(self, value: int) -> bool:
         return self.find_node(value) is not None
