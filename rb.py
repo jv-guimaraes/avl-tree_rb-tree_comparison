@@ -55,35 +55,23 @@ class RBTree:
         return graph(self.root)
 
     def insert(self, value: int) -> None:
-        new_node = Node(value)
-        # if new_node.value == 25: new_node.color = Color.BLACK
-        
-        if self.root is None:
-            self.root = new_node
-        else:
-            self._insert(new_node)
-
-        self._fix_insert(new_node)
-    
-    def _insert(self, new_node: Node):
-        assert(self.root)
-        curr_node = self.root
-        value = new_node.value
-
-        while True:
-            if value <= curr_node.value:
-                if curr_node.left is None:
-                    curr_node.left = new_node
-                    break
-                curr_node = curr_node.left
+        z = Node(value)
+        y: Optional[Node] = None
+        x = self.root
+        while x is not None:
+            y = x
+            if z.value < x.value:
+                x = x.left
             else:
-                if curr_node.right is None:
-                    curr_node.right = new_node
-                    break
-                curr_node = curr_node.right
-        
-        new_node.parent = curr_node
-
+                x = x.right
+        z.parent = y
+        if y is None:
+            self.root = z
+        elif z.value < y.value:
+            y.left = z
+        else:
+            y.right = z
+        self._fix_insert(z)
 
     def _fix_insert(self, node: Node):
         # Case 0: Root is red
@@ -138,45 +126,37 @@ class RBTree:
             return _search(node.right, value)
         return _search(self.root, value)
 
-    def rotate_right(self, node: Node):
-        assert node.left
-        parent = node.parent
-        child = node.left
-        node.left = child.right
-        if child.right:
-            child.right.parent = node
-        
-        child.right = node
-        node.parent = child
-        child.parent = parent
-        
-        if parent:
-            if parent.left == node:
-                parent.left = child
-            else:
-                parent.right = child
+    def rotate_right(self, x: Node):
+        assert x.left
+        y = x.left
+        x.left = y.right
+        if y.right is not None:
+            y.right.parent = x
+        y.parent = x.parent
+        if x.parent is None:
+            self.root = y
+        elif x == x.parent.right:
+            x.parent.right = y
         else:
-            self.root = child
-
-    def rotate_left(self, node: Node):
-        assert node.right
-        parent = node.parent
-        child = node.right
-        node.right = child.left
-        if child.left:
-            child.left.parent = node
-        
-        child.left = node
-        node.parent = child
-        child.parent = parent
-        
-        if parent:
-            if parent.left == node:
-                parent.left = child
-            else:
-                parent.right = child
+            x.parent.left = y
+        y.right = x
+        x.parent = y
+    
+    def rotate_left(self, x: Node):
+        assert x.right
+        y = x.right
+        x.right = y.left
+        if y.left is not None:
+            y.left.parent = x
+        y.parent = x.parent
+        if x.parent is None:
+            self.root = y
+        elif x == x.parent.left:
+            x.parent.left = y
         else:
-            self.root = child
+            x.parent.right = y
+        y.left = x
+        x.parent = y
 
 def graph(root: Node, block_size: int = 2) -> str:
     def _height(root: Optional[Node]) -> int:
