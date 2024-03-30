@@ -22,13 +22,7 @@ class RBTree:
     def __init__(self) -> None:
         self.root = self.nil
 
-    def __str__(self) -> str:
-        if self.root == self.nil:
-            return ""
-        return self.graph(self.root)
-
     def insert(self, value: int) -> None:
-        if self.contains(value): return
         z = Node(value)
         y = self.nil
         x = self.root
@@ -196,7 +190,10 @@ class RBTree:
         y.left = x
         x.p = y
 
-    def graph(self, root: Node, block_size: int = 2) -> str:
+    def is_empty(self) -> bool:
+        return self.root == self.nil
+
+    def graph(self, block_size: int = 2) -> str:
         def _height(root: Node) -> int:
             if root == self.nil:
                 return 0
@@ -210,10 +207,10 @@ class RBTree:
                 _walk(node.right, height - 1, x + walk, y + 1 * HEIGHT_FACTOR, matrix)
         
         HEIGHT_FACTOR = 2
-        h = _height(root)
+        h = _height(self.root)
         w = 2 ** h - 1
         matrix: list[list[Any]] = [[self.nil for _ in range(w)] for _ in range(h * HEIGHT_FACTOR)]
-        _walk(root, h, 2 ** (h - 1) - 1, 0, matrix)
+        _walk(self.root, h, 2 ** (h - 1) - 1, 0, matrix)
         
         buffer = StringIO()
         for row in matrix:

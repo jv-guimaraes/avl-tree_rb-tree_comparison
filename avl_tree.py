@@ -12,7 +12,7 @@ class Node:
 class AVLTree:
     def __init__(self):
         self.root = None
-    
+        
     def insert(self, value: int):
         
         def _insert(root: Optional[Node], value: int) -> Optional[Node]:
@@ -28,8 +28,7 @@ class AVLTree:
             
             return self._balance(root)
         
-        if self._search_node(value) is None:
-            self.root = _insert(self.root, value)
+        self.root = _insert(self.root, value)
     
     def _search_node(self, value: int) -> Optional[int]:
         
@@ -80,6 +79,9 @@ class AVLTree:
         # If the root has changed, the removal was successful
         # return old_root != self.root
     
+    def is_empty(self) -> bool:
+        return self.root is None
+
     def _get_height(self, node: Optional[Node]) -> int:
         if not node: return 0
         return node.height
