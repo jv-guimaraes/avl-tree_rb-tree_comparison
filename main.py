@@ -8,17 +8,12 @@ import matplotlib.ticker as ticker
 
 def main():
     insertions = [1_000, 5_000, 10_000, 17_500, 25_000]
-    avl_insertions: list[float] = []
-    avl_deletions: list[float] = []
-    rb_insertions: list[float] = []
-    rb_deletions: list[float] = []
-    
+
     print("Calculando tempos")
-    for i in insertions:
-        avl_insertions.append(time_insertions(AVLTree(), i, 5))
-        avl_deletions.append(time_deletions(AVLTree(), i, 5))
-        rb_insertions.append(time_insertions(RBTree(), i, 5))
-        rb_deletions.append(time_deletions(RBTree(), i, 5))
+    avl_insertions: list[float] = [time_insertions(AVLTree(), i, 5) for i in insertions]
+    avl_deletions: list[float] = [time_deletions(AVLTree(), i, 5) for i in insertions]
+    rb_insertions: list[float] = [time_insertions(RBTree(), i, 5) for i in insertions]
+    rb_deletions: list[float] = [time_deletions(RBTree(), i, 5) for i in insertions]
     print("Tempos calculados com sucesso")
     
     plt.plot(insertions, avl_insertions, label='AVL inserções')
