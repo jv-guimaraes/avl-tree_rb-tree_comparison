@@ -1,5 +1,6 @@
 from io import StringIO
 from typing import Any
+from abstract_tree import AbstractTree
 
 BLACK = 0
 RED = 1
@@ -15,7 +16,7 @@ class Node:
         self.value = value
         self.color = color
 
-class RBTree:
+class RBTree(AbstractTree):
     root: Node
     nil = Node(value=-1, color=BLACK)
 
@@ -192,6 +193,9 @@ class RBTree:
 
     def is_empty(self) -> bool:
         return self.root == self.nil
+    
+    def reset(self) -> None:
+        self.root = self.nil
 
     def graph(self, block_size: int = 2) -> str:
         def _height(root: Node) -> int:

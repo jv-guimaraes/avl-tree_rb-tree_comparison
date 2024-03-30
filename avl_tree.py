@@ -1,6 +1,7 @@
 from typing import Optional, Any
 from io import StringIO
 from dataclasses import dataclass
+from abstract_tree import AbstractTree
 
 @dataclass
 class Node:
@@ -9,7 +10,7 @@ class Node:
     right: Optional['Node'] = None
     height: int = 1        
          
-class AVLTree:
+class AVLTree(AbstractTree):
     def __init__(self):
         self.root = None
         
@@ -81,6 +82,9 @@ class AVLTree:
     
     def is_empty(self) -> bool:
         return self.root is None
+
+    def reset(self) -> None:
+        self.root = None
 
     def _get_height(self, node: Optional[Node]) -> int:
         if not node: return 0
