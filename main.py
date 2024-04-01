@@ -1,25 +1,26 @@
-from avl_tree import AVLTree
-from redblack_tree import RBTree
-from abstract_tree import AbstractTree
+from avl import ArvoreAVL
+from redblack import ArvoreRedBlack
+from arvore_abstrata import ArvoreAbstrata
 from random import randint
 from time import time
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
 def main():
-    insertions = [1_000, 5_000, 10_000, 17_500, 25_000]
+    inserções = [1000, 2000, 4000, 8000, 16000, 32000, 64000, 128000]
+    # inserções = [1_000, 10_000, 25_000]
 
     print("Calculando tempos")
-    avl_insertions: list[float] = [time_insertions(AVLTree(), i, 5) for i in insertions]
-    avl_deletions: list[float] = [time_deletions(AVLTree(), i, 5) for i in insertions]
-    rb_insertions: list[float] = [time_insertions(RBTree(), i, 5) for i in insertions]
-    rb_deletions: list[float] = [time_deletions(RBTree(), i, 5) for i in insertions]
+    avl_inserções: list[float] = [medir_inserções_ms(ArvoreAVL(), i, 3) for i in inserções]
+    avl_remoções: list[float] = [medir_remoções_ms(ArvoreAVL(), i, 3) for i in inserções]
+    rb_inserções: list[float] = [medir_inserções_ms(ArvoreRedBlack(), i, 3) for i in inserções]
+    rb_remoções: list[float] = [medir_remoções_ms(ArvoreRedBlack(), i, 3) for i in inserções]
     print("Tempos calculados com sucesso")
     
-    plt.plot(insertions, avl_insertions, label='AVL inserções')
-    plt.plot(insertions, avl_deletions, label='AVL remoções')
-    plt.plot(insertions, rb_insertions, label='Red-Black inserções')
-    plt.plot(insertions, rb_deletions, label='Red-Black remoções')
+    plt.plot(inserções, avl_inserções, label='AVL inserções', marker='o')
+    plt.plot(inserções, avl_remoções, label='AVL remoções', marker='o')
+    plt.plot(inserções, rb_inserções, label='Red-Black inserções', marker='o')
+    plt.plot(inserções, rb_remoções, label='Red-Black remoções', marker='o')
 
     plt.xlabel('Número de inserções/remoções')
     plt.ylabel('Tempo (ms)')
@@ -30,33 +31,33 @@ def main():
     
     plt.show()
 
-def time_insertions(tree: AbstractTree, num_insertions: int, num_tests: int):
-    test_results: list[float] = []
-    for _ in range(num_tests):
-        random_numbers = [randint(0, num_insertions) for _ in range(num_insertions)]
-        tree.reset()
+def medir_inserções_ms(arvore: ArvoreAbstrata, num_inserções: int, num_testes: int):
+    resultados: list[float] = []
+    for _ in range(num_testes):
+        random_numbers = [randint(0, num_inserções) for _ in range(num_inserções)]
+        arvore.resetar()
         start = time()
-        for i in range(num_insertions):
-            tree.insert(random_numbers[i])
-        test_results.append(time() - start)
+        for i in range(num_inserções):
+            arvore.inserir(random_numbers[i])
+        resultados.append(time() - start)
 
-    average = sum(test_results) / num_tests
-    return average * 1000
+    media = sum(resultados) / num_testes
+    return media * 1000
 
-def time_deletions(tree: AbstractTree, num_deletions: int, num_tests: int):
-    test_results: list[float] = []
-    for _ in range(num_tests):
-        random_numbers = [randint(0, num_deletions) for _ in range(num_deletions)]
-        tree.reset()
-        for i in range(num_deletions):
-            tree.insert(random_numbers[i])
+def medir_remoções_ms(arvore: ArvoreAbstrata, num_remoções: int, num_testes: int):
+    resultados: list[float] = []
+    for _ in range(num_testes):
+        random_numbers = [randint(0, num_remoções) for _ in range(num_remoções)]
+        arvore.resetar()
+        for i in range(num_remoções):
+            arvore.inserir(random_numbers[i])
         start = time()
-        for i in range(num_deletions):
-            tree.delete(random_numbers[i])
-        test_results.append(time() - start)
+        for i in range(num_remoções):
+            arvore.remover(random_numbers[i])
+        resultados.append(time() - start)
 
-    average = sum(test_results) / num_tests
-    return average * 1000
+    media = sum(resultados) / num_testes
+    return media * 1000
 
 if __name__ == "__main__":
     main()
